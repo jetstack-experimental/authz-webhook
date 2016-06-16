@@ -32,6 +32,5 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
     } else {
       resp = NewAuthorizationResponse(true)
     }
-
     json.NewEncoder(w).Encode(resp)
 }

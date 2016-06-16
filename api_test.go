@@ -100,19 +100,37 @@ func TestNewAuthorizationRequestApisPath(t *testing.T) {
 }
 
 // Test kube-system serviceaccount 'watch' verb
-func TestNewAuthorizationRequestWatchVerb(t *testing.T) {
-  reqJson := `{"spec":{"resourceAttributes":{"namespace":"kube-system","verb":"watch", "resource": "services"},"user":"system:serviceaccount:kube-system:default"}}`
+func TestNewAuthorizationRequestWatchVerbAllow(t *testing.T) {
+  reqJson := `{"spec":{"resourceAttributes":{"namespace":"default","verb":"watch", "resource": "services"},"user":"system:serviceaccount:kube-system:default"}}`
   result, err := postIndex(reqJson)
 
   if err != nil { t.Error(err) }
   if result.StatusCode != 200 { t.Errorf("Success expected: %d", result.StatusCode)}
 }
 
-// Test kube-system serviceaccount 'watch' verb
-func TestNewAuthorizationRequestListVerb(t *testing.T) {
-  reqJson := `{"spec":{"resourceAttributes":{"namespace":"kube-system","verb":"list", "resource": "nodes"},"user":"system:serviceaccount:kube-system:default"}}`
+// Don't allow 'watch' for other accounts
+func TestNewAuthorizationRequestWatchVerbDeny(t *testing.T) {
+  reqJson := `{"spec":{"resourceAttributes":{"namespace":"kube-system","verb":"watch", "resource": "services"},"user":"system:serviceaccount:default:default"}}`
+  result, err := postIndex(reqJson)
+
+  if err != nil { t.Error(err) }
+  if result.StatusCode != 403 { t.Errorf("Forbidden expected: %d", result.StatusCode)}
+}
+
+// Test kube-system serviceaccount 'list' verb
+func TestNewAuthorizationRequestListVerbAllow(t *testing.T) {
+  reqJson := `{"spec":{"resourceAttributes":{"namespace":"default","verb":"list", "resource": "nodes"},"user":"system:serviceaccount:kube-system:default"}}`
   result, err := postIndex(reqJson)
 
   if err != nil { t.Error(err) }
   if result.StatusCode != 200 { t.Errorf("Success expected: %d", result.StatusCode)}
+}
+
+// Don't allow 'list' for other accounts
+func TestNewAuthorizationRequestListVerbDeny(t *testing.T) {
+  reqJson := `{"spec":{"resourceAttributes":{"namespace":"kube-system","verb":"list", "resource": "nodes"},"user":"system:serviceaccount:default:default"}}`
+  result, err := postIndex(reqJson)
+
+  if err != nil { t.Error(err) }
+  if result.StatusCode != 403 { t.Errorf("Forbidden expected: %d", result.StatusCode)}
 }
