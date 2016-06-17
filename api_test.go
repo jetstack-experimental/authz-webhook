@@ -42,7 +42,15 @@ func parseResponse(r *http.Response) (*AuthorizationResponse, error) {
 
 // This should permit access for serviceaccount
 func TestNewAuthorizationRequestPermitSA(t *testing.T) {
-  reqJson := `{"spec":{ "resourceAttributes": {"namespace":"namespace-dev"}},"spec":{"user":"system:serviceaccount:namespace-sss:default"}}'`
+  reqJson := `
+  {
+    "spec":{
+      "resourceAttributes": {
+        "namespace":"namespace-dev"
+      },
+      "user":"system:serviceaccount:namespace-sss:default"
+    }
+  }`
   result, err := postIndex(reqJson)
 
   if err != nil { t.Error(err) }
@@ -54,7 +62,15 @@ func TestNewAuthorizationRequestPermitSA(t *testing.T) {
 
 // Should permit end-user straight away
 func TestNewAuthorizationRequestPermitUser(t *testing.T) {
-  reqJson := `{"spec":{ "resourceAttributes": {"namespace":"namespace-dev"}},"spec": {"user":"someuser"}}'`
+  reqJson := `
+  {
+    "spec":{
+      "resourceAttributes": {
+        "namespace":"namespace-dev"
+      },
+      "user": "someuser"
+    }
+  }`
   result, err := postIndex(reqJson)
 
   if err != nil { t.Error(err) }
@@ -64,7 +80,15 @@ func TestNewAuthorizationRequestPermitUser(t *testing.T) {
 
 // Should deny serviceaccount on namespace mismatch away
 func TestNewAuthorizationRequestDenySA(t *testing.T) {
-  reqJson := `{"spec":{ "resourceAttributes": {"namespace":"namespace-dev"}},"spec": {"user":"system:serviceaccount:default:default"}}'`
+  reqJson := `
+  {
+    "spec":{
+      "resourceAttributes":{
+        "namespace":"namespace-dev"
+      },
+      "user":"system:serviceaccount:default:default"
+    }
+  }`
   result, err := postIndex(reqJson)
 
   if err != nil { t.Error(err) }
@@ -92,7 +116,16 @@ func TestNewAuthorizationRequestBadRequest(t *testing.T) {
 
 // Test serviceaccount '/apis' path
 func TestNewAuthorizationRequestApisPath(t *testing.T) {
-  reqJson := `{"spec":{"nonResourceAttributes":{"path":"/apis","verb":"get"},"user":"system:serviceaccount:random:default"}}`
+  reqJson := `
+  {
+    "spec":{
+      "nonResourceAttributes":{
+        "path":"/apis",
+        "verb":"get"
+      },
+      "user":"system:serviceaccount:random:default"
+    }
+  }`
   result, err := postIndex(reqJson)
 
   if err != nil { t.Error(err) }
@@ -101,7 +134,17 @@ func TestNewAuthorizationRequestApisPath(t *testing.T) {
 
 // Test kube-system serviceaccount 'watch' verb
 func TestNewAuthorizationRequestWatchVerbAllow(t *testing.T) {
-  reqJson := `{"spec":{"resourceAttributes":{"namespace":"default","verb":"watch", "resource": "services"},"user":"system:serviceaccount:kube-system:default"}}`
+  reqJson := `
+  {
+    "spec":{
+      "resourceAttributes":{
+        "namespace":"default",
+        "verb":"watch",
+        "resource": "services"
+      },
+      "user":"system:serviceaccount:kube-system:default"
+    }
+  }`
   result, err := postIndex(reqJson)
 
   if err != nil { t.Error(err) }
@@ -110,7 +153,17 @@ func TestNewAuthorizationRequestWatchVerbAllow(t *testing.T) {
 
 // Don't allow 'watch' for other accounts
 func TestNewAuthorizationRequestWatchVerbDeny(t *testing.T) {
-  reqJson := `{"spec":{"resourceAttributes":{"namespace":"kube-system","verb":"watch", "resource": "services"},"user":"system:serviceaccount:default:default"}}`
+  reqJson := `
+  {
+    "spec":{
+      "resourceAttributes":{
+        "namespace":"kube-system",
+        "verb":"watch",
+        "resource": "services"
+      },
+      "user":"system:serviceaccount:default:default"
+    }
+  }`
   result, err := postIndex(reqJson)
 
   if err != nil { t.Error(err) }
@@ -119,7 +172,17 @@ func TestNewAuthorizationRequestWatchVerbDeny(t *testing.T) {
 
 // Test kube-system serviceaccount 'list' verb
 func TestNewAuthorizationRequestListVerbAllow(t *testing.T) {
-  reqJson := `{"spec":{"resourceAttributes":{"namespace":"default","verb":"list", "resource": "nodes"},"user":"system:serviceaccount:kube-system:default"}}`
+  reqJson := `
+  {
+    "spec":{
+      "resourceAttributes":{
+        "namespace":"default",
+        "verb":"list",
+        "resource": "nodes"
+      },
+      "user":"system:serviceaccount:kube-system:default"
+    }
+  }`
   result, err := postIndex(reqJson)
 
   if err != nil { t.Error(err) }
@@ -128,7 +191,17 @@ func TestNewAuthorizationRequestListVerbAllow(t *testing.T) {
 
 // Don't allow 'list' for other accounts
 func TestNewAuthorizationRequestListVerbDeny(t *testing.T) {
-  reqJson := `{"spec":{"resourceAttributes":{"namespace":"kube-system","verb":"list", "resource": "nodes"},"user":"system:serviceaccount:default:default"}}`
+  reqJson := `
+  {
+    "spec":{
+      "resourceAttributes":{
+        "namespace":"kube-system",
+        "verb":"list",
+        "resource":"nodes"
+      },
+      "user":"system:serviceaccount:default:default"
+    }
+  }`
   result, err := postIndex(reqJson)
 
   if err != nil { t.Error(err) }
