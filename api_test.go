@@ -1,48 +1,50 @@
 package main
 
 import (
-  "testing"
-  "fmt"
-  "strings"
-  "encoding/json"
-  "io"
-  "io/ioutil"
-  "net/http"
-  "net/http/httptest"
+	"encoding/json"
+	"fmt"
+	"io"
+	"io/ioutil"
+	"net/http"
+	"net/http/httptest"
+	"strings"
+	"testing"
 )
 
 var (
-  server   *httptest.Server
-  reader   io.Reader
-  index    string
+	server *httptest.Server
+	reader io.Reader
+	index  string
 )
 
 func init() {
-  server = httptest.NewServer(Handlers())
-  index = fmt.Sprintf("%s/", server.URL)
+	server = httptest.NewServer(Handlers())
+	index = fmt.Sprintf("%s/", server.URL)
 }
 
 func postIndex(data string) (*http.Response, error) {
-  reader = strings.NewReader(data)
+	reader = strings.NewReader(data)
 
-  request, err := http.NewRequest("POST", index, reader)
-  res, err := http.DefaultClient.Do(request)
-  return res, err
+	request, err := http.NewRequest("POST", index, reader)
+	res, err := http.DefaultClient.Do(request)
+	return res, err
 
 }
 
 func parseResponse(r *http.Response) (*AuthorizationResponse, error) {
-  body, err := ioutil.ReadAll(r.Body)
-  if err != nil { return nil, err }
+	body, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		return nil, err
+	}
 
-  respJson := NewAuthorizationResponse(true)
-  err = json.Unmarshal(body, &respJson)
-  return respJson, err
+	respJson := NewAuthorizationResponse(true)
+	err = json.Unmarshal(body, &respJson)
+	return respJson, err
 }
 
 // This should permit access for serviceaccount
 func TestNewAuthorizationRequestPermitSA(t *testing.T) {
-  reqJson := `
+	reqJson := `
   {
     "spec":{
       "resourceAttributes": {
@@ -51,18 +53,20 @@ func TestNewAuthorizationRequestPermitSA(t *testing.T) {
       "user":"system:serviceaccount:namespace-sss:default"
     }
   }`
-  result, err := postIndex(reqJson)
+	result, err := postIndex(reqJson)
 
-  if err != nil { t.Error(err) }
+	if err != nil {
+		t.Error(err)
+	}
 
-  if result.StatusCode != 200 {
-    t.Errorf("Success expected: %d", result.StatusCode)
-  }
+	if result.StatusCode != 200 {
+		t.Errorf("Success expected: %d", result.StatusCode)
+	}
 }
 
 // Should permit end-user straight away
 func TestNewAuthorizationRequestPermitUser(t *testing.T) {
-  reqJson := `
+	reqJson := `
   {
     "spec":{
       "resourceAttributes": {
@@ -71,16 +75,20 @@ func TestNewAuthorizationRequestPermitUser(t *testing.T) {
       "user": "someuser"
     }
   }`
-  result, err := postIndex(reqJson)
+	result, err := postIndex(reqJson)
 
-  if err != nil { t.Error(err) }
+	if err != nil {
+		t.Error(err)
+	}
 
-  if result.StatusCode != 200 { t.Errorf("Success expected: %d", result.StatusCode) }
+	if result.StatusCode != 200 {
+		t.Errorf("Success expected: %d", result.StatusCode)
+	}
 }
 
 // Should deny serviceaccount on namespace mismatch away
 func TestNewAuthorizationRequestDenySA(t *testing.T) {
-  reqJson := `
+	reqJson := `
   {
     "spec":{
       "resourceAttributes":{
@@ -89,34 +97,44 @@ func TestNewAuthorizationRequestDenySA(t *testing.T) {
       "user":"system:serviceaccount:default:default"
     }
   }`
-  result, err := postIndex(reqJson)
+	result, err := postIndex(reqJson)
 
-  if err != nil { t.Error(err) }
+	if err != nil {
+		t.Error(err)
+	}
 
-  if result.StatusCode != 403 { t.Errorf("Forbidden expected: %d", result.StatusCode) }
+	if result.StatusCode != 403 {
+		t.Errorf("Forbidden expected: %d", result.StatusCode)
+	}
 
-  respJson, err := parseResponse(result)
-  if err != nil { t.Error(err) }
+	respJson, err := parseResponse(result)
+	if err != nil {
+		t.Error(err)
+	}
 
-  if respJson.Status.Allowed != false {
-    t.Errorf("Bad response status: %t", respJson.Status.Allowed)
-  }
+	if respJson.Status.Allowed != false {
+		t.Errorf("Bad response status: %t", respJson.Status.Allowed)
+	}
 
 }
 
 // Should generate status 400 if bad request
 func TestNewAuthorizationRequestBadRequest(t *testing.T) {
-  reqJson := `asd`
-  result, err := postIndex(reqJson)
+	reqJson := `asd`
+	result, err := postIndex(reqJson)
 
-  if err != nil { t.Error(err) }
+	if err != nil {
+		t.Error(err)
+	}
 
-  if result.StatusCode != 400 { t.Errorf("Bad request expected: %d", result.StatusCode) }
+	if result.StatusCode != 400 {
+		t.Errorf("Bad request expected: %d", result.StatusCode)
+	}
 }
 
 // Test serviceaccount '/apis' path
 func TestNewAuthorizationRequestApisPath(t *testing.T) {
-  reqJson := `
+	reqJson := `
   {
     "spec":{
       "nonResourceAttributes":{
@@ -126,15 +144,19 @@ func TestNewAuthorizationRequestApisPath(t *testing.T) {
       "user":"system:serviceaccount:random:default"
     }
   }`
-  result, err := postIndex(reqJson)
+	result, err := postIndex(reqJson)
 
-  if err != nil { t.Error(err) }
-  if result.StatusCode != 200 { t.Errorf("Success expected: %d", result.StatusCode)}
+	if err != nil {
+		t.Error(err)
+	}
+	if result.StatusCode != 200 {
+		t.Errorf("Success expected: %d", result.StatusCode)
+	}
 }
 
 // Test kube-system serviceaccount 'watch' verb
 func TestNewAuthorizationRequestWatchVerbAllow(t *testing.T) {
-  reqJson := `
+	reqJson := `
   {
     "spec":{
       "resourceAttributes":{
@@ -145,15 +167,19 @@ func TestNewAuthorizationRequestWatchVerbAllow(t *testing.T) {
       "user":"system:serviceaccount:kube-system:default"
     }
   }`
-  result, err := postIndex(reqJson)
+	result, err := postIndex(reqJson)
 
-  if err != nil { t.Error(err) }
-  if result.StatusCode != 200 { t.Errorf("Success expected: %d", result.StatusCode)}
+	if err != nil {
+		t.Error(err)
+	}
+	if result.StatusCode != 200 {
+		t.Errorf("Success expected: %d", result.StatusCode)
+	}
 }
 
 // Don't allow 'watch' for other accounts
 func TestNewAuthorizationRequestWatchVerbDeny(t *testing.T) {
-  reqJson := `
+	reqJson := `
   {
     "spec":{
       "resourceAttributes":{
@@ -164,15 +190,19 @@ func TestNewAuthorizationRequestWatchVerbDeny(t *testing.T) {
       "user":"system:serviceaccount:default:default"
     }
   }`
-  result, err := postIndex(reqJson)
+	result, err := postIndex(reqJson)
 
-  if err != nil { t.Error(err) }
-  if result.StatusCode != 403 { t.Errorf("Forbidden expected: %d", result.StatusCode)}
+	if err != nil {
+		t.Error(err)
+	}
+	if result.StatusCode != 403 {
+		t.Errorf("Forbidden expected: %d", result.StatusCode)
+	}
 }
 
 // Test kube-system serviceaccount 'list' verb
 func TestNewAuthorizationRequestListVerbAllow(t *testing.T) {
-  reqJson := `
+	reqJson := `
   {
     "spec":{
       "resourceAttributes":{
@@ -183,15 +213,19 @@ func TestNewAuthorizationRequestListVerbAllow(t *testing.T) {
       "user":"system:serviceaccount:kube-system:default"
     }
   }`
-  result, err := postIndex(reqJson)
+	result, err := postIndex(reqJson)
 
-  if err != nil { t.Error(err) }
-  if result.StatusCode != 200 { t.Errorf("Success expected: %d", result.StatusCode)}
+	if err != nil {
+		t.Error(err)
+	}
+	if result.StatusCode != 200 {
+		t.Errorf("Success expected: %d", result.StatusCode)
+	}
 }
 
 // Don't allow 'list' for other accounts
 func TestNewAuthorizationRequestListVerbDeny(t *testing.T) {
-  reqJson := `
+	reqJson := `
   {
     "spec":{
       "resourceAttributes":{
@@ -202,8 +236,12 @@ func TestNewAuthorizationRequestListVerbDeny(t *testing.T) {
       "user":"system:serviceaccount:default:default"
     }
   }`
-  result, err := postIndex(reqJson)
+	result, err := postIndex(reqJson)
 
-  if err != nil { t.Error(err) }
-  if result.StatusCode != 403 { t.Errorf("Forbidden expected: %d", result.StatusCode)}
+	if err != nil {
+		t.Error(err)
+	}
+	if result.StatusCode != 403 {
+		t.Errorf("Forbidden expected: %d", result.StatusCode)
+	}
 }
