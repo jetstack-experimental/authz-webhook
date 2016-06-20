@@ -41,7 +41,9 @@ func NewAuthzUser(req *AuthorizationRequest) *AuthzUser {
 func (r *AuthzUser) IsAllowed() bool {
 	// allow kubectl auto-detect requests:
 	// 'get' to /apis
-	if (r.request.Path() == "/apis" || r.request.Path() == "/api") && r.request.Action() == "get" {
+	if (r.request.Path() == "/apis" ||
+		r.request.Path() == "/api" ||
+		r.request.Path() == "/version") && r.request.Action() == "get" {
 		return true
 	}
 

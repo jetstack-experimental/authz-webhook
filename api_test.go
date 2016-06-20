@@ -110,7 +110,8 @@ func TestNewAuthorizationByPath(t *testing.T) {
 	}{
 		{"/apis", "get", "system:serviceaccount:random:default", 200},
 		{"/api", "get", "system:serviceaccount:random:default", 200},
-		{"/version", "get", "system:serviceaccount:random:default", 403},
+		{"/version", "get", "system:serviceaccount:random:default", 200},
+		{"/api/v1", "get", "system:serviceaccount:random:default", 403},
 	}
 
 	for _, tst := range saTests {
