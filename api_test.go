@@ -50,6 +50,7 @@ func TestNewAuthorizationByNamespace(t *testing.T) {
 		allowed   bool
 	}{
 		{"namespace-dev", "system:serviceccount:namespace-sss:default", 200, true},
+		{"namespace", "system:serviceaccount:namespace-sss:default", 200, true},
 		{"namespace-dev", "someuser", 200, true},
 		{"namespace-dev", "system:serviceaccount:default-ns:default", 403, false},
 	}

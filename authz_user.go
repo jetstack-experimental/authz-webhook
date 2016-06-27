@@ -36,14 +36,41 @@ func NewAuthzUser(req *AuthorizationRequest) *AuthzUser {
 	}
 }
 
+// IsAllowedPath returns true if request path matches allowed list
+func (r *AuthzUser) IsAllowedPath() bool {
+	allowedPaths := [...]string{"/api", "/apis", "/version"}
+
+	for _, path := range allowedPaths {
+		if path == r.request.Path() {
+			return true
+		}
+	}
+	return false
+}
+
+// IsAllowedSystemAction allows kube-system serviceaccount list and watch
+// actions (requirement for kube-dns)
+func (r *AuthzUser) IsAllowedSystemAction() bool {
+	allowedActions := [...]string{"list", "watch"}
+	allowedAccount := "system:serviceaccount:kube-system:default"
+
+	for _, action := range allowedActions {
+		if action == r.request.Action() && allowedAccount == r.Username() {
+			return true
+		}
+	}
+	return false
+}
+
 // IsAllowed checks if service account can access resource
 // returns true on success, false otherwise
 func (r *AuthzUser) IsAllowed() bool {
-	// allow kubectl auto-detect requests:
-	// 'get' to /apis
-	if (r.request.Path() == "/apis" ||
-		r.request.Path() == "/api" ||
-		r.request.Path() == "/version") && r.request.Action() == "get" {
+
+	if r.IsAllowedPath() {
+		return true
+	}
+
+	if r.IsAllowedSystemAction() {
 		return true
 	}
 
@@ -62,6 +89,7 @@ func (r *AuthzUser) IsAllowed() bool {
 	if actionNamespace == "" {
 		return false
 	}
+
 	// We allow access for namespace-${anything} user to namespace-${anything}
 	strippedUserNamespace := stripLastPart(userNamespace, "-")
 	strippedActionNamespace := stripLastPart(actionNamespace, "-")
