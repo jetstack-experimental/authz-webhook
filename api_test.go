@@ -174,3 +174,38 @@ func TestNewAuthorizationByVerb(t *testing.T) {
 		}
 	}
 }
+
+func TestCustomVerb(t *testing.T) {
+	var saTests = []struct {
+		verb     string
+		group    string
+		resource string
+		username string
+		status   int
+	}{
+		{"create", "extensions", "thirdpartyresources", "system:serviceaccount:random:default", 200},
+	}
+
+	for _, tst := range saTests {
+		reqJSON := fmt.Sprintf(`
+    {
+      "spec":{
+        "resourceAttributes":{
+          "group":"%s",
+          "verb":"%s",
+          "resource": "services"
+        },
+        "user":"%s"
+      }
+    }`, tst.group, tst.verb, tst.username)
+		result, err := postIndex(reqJSON)
+
+		if err != nil {
+			t.Error(err)
+		}
+		if result.StatusCode != tst.status {
+			t.Errorf("Expected status %d, got: %d (%s)", tst.status, result.StatusCode, reqJSON)
+		}
+	}
+
+}
