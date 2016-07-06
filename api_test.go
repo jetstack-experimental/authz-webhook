@@ -53,6 +53,7 @@ func TestNewAuthorizationByNamespace(t *testing.T) {
 		{"namespace", "system:serviceaccount:namespace-sss:default", 200, true},
 		{"namespace-dev", "someuser", 200, true},
 		{"namespace-dev", "system:serviceaccount:default-ns:default", 403, false},
+		{"sample-app-dev", "system:serviceaccount:sample-app:default", 200, true},
 	}
 
 	for _, tst := range saTests {

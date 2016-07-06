@@ -66,7 +66,9 @@ func (r *AuthzUser) IsAllowed() bool {
 	// We allow access for namespace-${anything} user to namespace-${anything}
 	strippedUserNamespace := stripLastPart(userNamespace, "-")
 	strippedActionNamespace := stripLastPart(actionNamespace, "-")
-	return strippedUserNamespace == strippedActionNamespace
+	return strippedUserNamespace == strippedActionNamespace ||
+		strippedUserNamespace == actionNamespace ||
+		strippedActionNamespace == userNamespace
 }
 
 // IsServiceAccount returns true if user is service account
