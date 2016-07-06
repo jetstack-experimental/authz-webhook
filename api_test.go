@@ -193,11 +193,11 @@ func TestCustomVerb(t *testing.T) {
         "resourceAttributes":{
           "group":"%s",
           "verb":"%s",
-          "resource": "services"
+          "resource": "%s"
         },
         "user":"%s"
       }
-    }`, tst.group, tst.verb, tst.username)
+    }`, tst.group, tst.verb, tst.resource, tst.username)
 		result, err := postIndex(reqJSON)
 
 		if err != nil {

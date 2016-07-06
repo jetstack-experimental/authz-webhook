@@ -36,26 +36,10 @@ func NewAuthzUser(req *AuthorizationRequest) *AuthzUser {
 	}
 }
 
-// IsAllowedPath returns true if request path matches allowed list
-func (r *AuthzUser) IsAllowedPath() bool {
-	allowedPaths := [...]string{"/api", "/apis", "/version"}
-
-	for _, path := range allowedPaths {
-		if path == r.request.Path() {
-			return true
-		}
-	}
-	return false
-}
-
-// IsAllowedSystemAction allows kube-system serviceaccount list and watch
-// actions (requirement for kube-dns)
-func (r *AuthzUser) IsAllowedSystemAction() bool {
-	allowedActions := [...]string{"list", "watch"}
-	allowedAccount := "system:serviceaccount:kube-system:default"
-
-	for _, action := range allowedActions {
-		if action == r.request.Action() && allowedAccount == r.Username() {
+// IsWhitelisted allows whitelisted requests. See whitelist.go
+func (r *AuthzUser) IsWhitelisted() bool {
+	for _, entry := range Whitelist {
+		if entry.Matches(r.Username(), r.request) {
 			return true
 		}
 	}
@@ -65,18 +49,7 @@ func (r *AuthzUser) IsAllowedSystemAction() bool {
 // IsAllowed checks if service account can access resource
 // returns true on success, false otherwise
 func (r *AuthzUser) IsAllowed() bool {
-
-	if r.IsAllowedPath() {
-		return true
-	}
-
-	if r.IsAllowedSystemAction() {
-		return true
-	}
-
-	// allow all 'list', 'watch' actions to kube-system service account
-	if (r.Username() == "system:serviceaccount:kube-system:default") &&
-		(r.request.Action() == "list" || r.request.Action() == "watch") {
+	if r.IsWhitelisted() {
 		return true
 	}
 
