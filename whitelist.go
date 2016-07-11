@@ -40,6 +40,10 @@ var Whitelist = []UserAction{
 		Path: "/swaggerapi/api/v1",
 		Verb: "get",
 	},
+	{
+		Path: "/swaggerapi/apis/extensions/v1beta1",
+		Verb: "get",
+	},
 }
 
 // Matches is true if username is allowed to perform action specified in AuthorizationRequest
