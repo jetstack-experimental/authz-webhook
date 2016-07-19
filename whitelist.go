@@ -23,6 +23,10 @@ var Whitelist = []UserAction{
 		Verb:     "watch",
 	},
 	{
+		Username: "system:serviceaccount:kube-system:default",
+		Verb:     "get",
+	},
+	{
 		Verb:     "create",
 		Group:    "extensions",
 		Resource: "thirdpartyresources",

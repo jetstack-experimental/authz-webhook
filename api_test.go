@@ -54,6 +54,7 @@ func TestNewAuthorizationByNamespace(t *testing.T) {
 		{"namespace-dev", "someuser", 200, true},
 		{"namespace-dev", "system:serviceaccount:default-ns:default", 403, false},
 		{"sample-app-dev", "system:serviceaccount:sample-app:default", 200, true},
+		{"sample-app-dev", "system:serviceaccount:kube-system:default", 200, true},
 	}
 
 	for _, tst := range saTests {
@@ -113,7 +114,7 @@ func TestNewAuthorizationByPath(t *testing.T) {
 		{"/apis", "get", "system:serviceaccount:random:default", 200},
 		{"/api", "get", "system:serviceaccount:random:default", 200},
 		{"/version", "get", "system:serviceaccount:random:default", 200},
-                {"/swaggerapi/apis/extensions/v1beta1", "get", "system:serviceaccount:random:default", 200},
+		{"/swaggerapi/apis/extensions/v1beta1", "get", "system:serviceaccount:random:default", 200},
 		{"/api/v1", "get", "system:serviceaccount:random:default", 403},
 	}
 
