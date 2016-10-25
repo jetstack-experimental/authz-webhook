@@ -20,6 +20,8 @@ var (
 func init() {
 	server = httptest.NewServer(Handlers())
 	index = fmt.Sprintf("%s/", server.URL)
+
+	LoadConfigFromFile("rules.hcl")
 }
 
 func postIndex(data string) (*http.Response, error) {
@@ -49,11 +51,12 @@ func TestNewAuthorizationByNamespace(t *testing.T) {
 		status    int
 		allowed   bool
 	}{
-		{"namespace-dev", "system:serviceccount:namespace-sss:default", 200, true},
+		{"namespace-dev", "system:serviceaccount:namespace-sss:default", 200, true},
 		{"namespace", "system:serviceaccount:namespace-sss:default", 200, true},
 		{"namespace-dev", "someuser", 200, true},
 		{"namespace-dev", "system:serviceaccount:default-ns:default", 403, false},
-		{"sample-app-dev", "system:serviceaccount:sample-app:default", 200, true},
+		{"sample-app", "system:serviceaccount:sample-app:default", 200, true},
+		{"sample-app", "system:serviceaccount:sample-app:default", 200, true},
 		{"sample-app-dev", "system:serviceaccount:kube-system:default", 200, true},
 	}
 
