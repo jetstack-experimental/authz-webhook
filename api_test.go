@@ -21,7 +21,7 @@ func init() {
 	server = httptest.NewServer(Handlers())
 	index = fmt.Sprintf("%s/", server.URL)
 
-	LoadConfigFromFile("rules.hcl")
+	LoadConfigFromFile("examples/example1.hcl")
 }
 
 func postIndex(data string) (*http.Response, error) {
