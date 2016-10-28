@@ -18,5 +18,12 @@ func NewServiceAccount(userString string) *ServiceAccount {
 			Namespace: data[2],
 		}
 	}
-	return &ServiceAccount{}
+
+	// Underscores are invalid chars for namespaces/users. This ensures that
+	// non-serviceaccount wouldn't match against .ServiceAccount.User by
+	// accident.
+	return &ServiceAccount{
+		User:      "_",
+		Namespace: "_",
+	}
 }

@@ -4,6 +4,10 @@ access "allow" {
     verb = "(list|watch|get)"
 }
 
+access "deny" {
+    username = "badguy"
+}
+
 # God mode for regular non-serviceaccount users 
 access "allow" {
     username = "[a-z]+"

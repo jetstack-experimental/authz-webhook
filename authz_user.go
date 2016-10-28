@@ -17,8 +17,11 @@ func NewAuthzUser(req *AuthorizationRequest) *AuthzUser {
 // returns true on success, false otherwise
 func (r *AuthzUser) IsAllowed() bool {
 	for _, entry := range config.Rules {
-		if entry.Matches(r.context) {
+		accessMode := entry.GetAccessMode(r.context)
+		if accessMode == ALLOW {
 			return true
+		} else if accessMode == DENY {
+			return false
 		}
 	}
 	return false

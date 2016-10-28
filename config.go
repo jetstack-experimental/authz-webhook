@@ -33,6 +33,14 @@ type ConfigRule struct {
 	Path      string
 }
 
+type AccessMode int
+
+const (
+	NOMATCH AccessMode = 1 + iota
+	ALLOW
+	DENY
+)
+
 // LoadConfigFromFile loads configuration from
 // hcl into config structure
 func LoadConfigFromFile(path string) error {
@@ -63,8 +71,8 @@ func LoadConfigFromByteArray(hclText []byte) error {
 	return nil
 }
 
-// Matches returns true if request is described in the rule
-func (s *ConfigRule) Matches(context *RequestContext) bool {
+// GetAccessMode returns allow/deny if request is described in the rule
+func (s *ConfigRule) GetAccessMode(context *RequestContext) AccessMode {
 
 	matchData := map[string]string{
 		s.Username:  context.Username,
@@ -79,14 +87,17 @@ func (s *ConfigRule) Matches(context *RequestContext) bool {
 		t, err := compileTemplate(k, context)
 		if err != nil {
 			fmt.Println(err)
-			return false
+			return NOMATCH
 		}
 		res := match(t, v)
 		if res == false {
-			return false
+			return NOMATCH
 		}
 	}
-	return s.Mode == "allow"
+	if s.Mode == "deny" {
+		return DENY
+	}
+	return ALLOW
 }
 
 func compileTemplate(tmpl string, context *RequestContext) (string, error) {
