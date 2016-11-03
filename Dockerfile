@@ -1,3 +1,5 @@
 FROM busybox
-ADD bitesize-authz-webhook /
-CMD ["/bitesize-authz-webhook"]
+ENV LISTEN_PORT 8888
+EXPOSE 8888
+ADD authz-webhook /
+CMD ["/authz-webhook"]
