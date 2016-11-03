@@ -38,3 +38,4 @@ access "deny" {
 
 * 0.0.5 - First open-source release. Supports HCL rules.
 * 0.0.6 - Adds automated travis builds
+* 0.0.7 - Be transparent if config file load fails
