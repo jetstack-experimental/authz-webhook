@@ -1,9 +1,11 @@
 # Bitesize AuthZ Webhook
 
+[![Build Status](https://travis-ci.org/jetstack-experimental/authz-webhook.svg?branch=master)](https://travis-ci.org/jetstack-experimental/authz-webhook)
+
 ## Installation
 
-`bitesize-authz-webhook` is packaged into docker container and can be found at
-`geribatai/bitesize-authz-webhook:0.0.5`. Currently it does not support HTTPS
+`authz-webhook` is packaged into docker container and can be found at
+`jetstackexperimental/authz-webhook:latest`. Currently it does not support HTTPS
 termination, so it is advised to run it behind HTTPS proxy.
 
 ## Configuration
