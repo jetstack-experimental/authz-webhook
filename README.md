@@ -37,3 +37,4 @@ access "deny" {
 ## Changelog
 
 * 0.0.5 - First open-source release. Supports HCL rules.
+* 0.0.6 - Adds automated travis builds
