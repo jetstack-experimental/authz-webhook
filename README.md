@@ -3,7 +3,7 @@
 ## Installation
 
 `bitesize-authz-webhook` is packaged into docker container and can be found at
-`geribatai/bitesize-authz-webhook`. We do not pust a 'latest' container so reference the version number.
+`geribatai/bitesize-authz-webhook`. We do not push a 'latest' container so reference the version number.
 Currently it does not support HTTPS termination, so it is advised to run it behind HTTPS proxy.
 
 ## Configuration
