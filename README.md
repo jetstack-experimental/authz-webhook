@@ -32,6 +32,9 @@ access "deny" {
 }
 ```
 
+Additional examples can be found in `examples` directory.
+
+
 ## Changelog
 
 * 0.0.5 - First open-source release. Supports HCL rules.
